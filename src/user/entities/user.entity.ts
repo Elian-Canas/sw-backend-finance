@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 @Entity('users')
 export class User {
@@ -10,20 +16,31 @@ export class User {
   })
   email: string;
 
-  @Column('text')
+  @Column('text', {
+    select: false,
+  })
   password: string;
 
-  @Column('text')
-  name: string;
+  @Column('text', { nullable: true })
+  first_name: string;
+
+  @Column('text', { nullable: true })
+  last_name: string;
 
   @Column('int', {
     default: 1,
   })
   state: number;
 
-  @Column('text', {
-    array: true,
-    default: ['user'],
-  })
-  profiles: string[];
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @Column('int', { nullable: true })
+  createdBy: number;
+
+  @Column('int', { nullable: true })
+  updatedBy: number;
 }
