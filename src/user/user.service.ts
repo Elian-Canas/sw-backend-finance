@@ -1,16 +1,16 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
+import { Repository } from "typeorm";
+import { User } from "./entities/user.entity";
+import { InjectRepository } from "@nestjs/typeorm";
 import {
   BadRequestException,
   InternalServerErrorException,
-} from '@nestjs/common';
-import { EncryptBcryptAdapter } from 'src/adapters/encrypt.adapter';
-import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
+} from "@nestjs/common";
+import { EncryptBcryptAdapter } from "src/adapters/encrypt.adapter";
+import { JwtService } from "@nestjs/jwt";
+import { JwtPayload } from "./interfaces/jwt-payload.interface";
 
 @Injectable()
 export class UserService {
@@ -18,16 +18,17 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly encryptAdapter: EncryptBcryptAdapter,
-    private readonly jwtService: JwtService,
+    private readonly jwtService: JwtService
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto, userHeader: number) {
     try {
       const { password, ...userData } = createUserDto;
 
       const user = this.userRepository.create({
         ...userData,
         password: await this.encryptAdapter.encrypt(password),
+        created_by: userHeader ?? null,
       });
       await this.userRepository.save(user);
       return user;
@@ -44,10 +45,10 @@ export class UserService {
     });
 
     if (!user)
-      throw new UnauthorizedException('Credentials are not valid (email)');
+      throw new UnauthorizedException("Credentials are not valid (email)");
 
     if (!this.encryptAdapter.compareSync(password, user.password)) {
-      throw new UnauthorizedException('Credentials are not valid (password)');
+      throw new UnauthorizedException("Credentials are not valid (password)");
     }
 
     return {
@@ -83,19 +84,19 @@ export class UserService {
     }
   }
 
-  async inactivate(id: number) {
-    try {
-      await this.userRepository.update(id, { state: 0 });
-      return { message: 'User inactivated successfully' };
+  async setState(id: number, state: number, userId: number) {
+  try {
+      await this.userRepository.update(id, { state, updated_by: userId });
+      return { message: `User ${state === 1 ? "activated" : "inactivated"} successfully` };
     } catch (error) {
       this.handleDBErrors(error);
     }
   }
 
   private handleDBErrors(error: any): never {
-    if (error.code === '23505') throw new BadRequestException(error.detail);
+    if (error.code === "23505") throw new BadRequestException(error.detail);
 
     console.log(error);
-    throw new InternalServerErrorException('Please check server logs');
+    throw new InternalServerErrorException("Please check server logs");
   }
 }
