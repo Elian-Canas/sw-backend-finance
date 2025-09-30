@@ -8,7 +8,7 @@ import { EncryptBcryptAdapter } from 'src/adapters/encrypt.adapter';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtStrategy } from 'src/strategies/jwt.strategy';
+import { JwtStrategy } from 'src/user/strategies/jwt.strategy';
 
 @Module({
   controllers: [UserController],
@@ -21,11 +21,10 @@ import { JwtStrategy } from 'src/strategies/jwt.strategy';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        console.log('JWT_SECRET', configService.get('JWT_SECRET'));
-        console.log('JWT_EXPIRES_IN', configService.get('JWT_EXPIRES_IN'));
+        console.log('JWT_SECRET', configService.get('JWT_EXPIRES_IN'));
         return {
           secret: configService.get('JWT_SECRET'),
-          signOptions: { expiresIn: '1h' },
+          signOptions: { expiresIn: configService.get('JWT_EXPIRES_IN') },
         };
       },
     }),

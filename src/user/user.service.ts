@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { EncryptBcryptAdapter } from 'src/adapters/encrypt.adapter';
 import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
@@ -19,6 +19,7 @@ export class UserService {
     private readonly userRepository: Repository<User>,
     private readonly encryptAdapter: EncryptBcryptAdapter,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -57,7 +58,9 @@ export class UserService {
   }
 
   private getJwtToken(payload: { id: number; email: string }) {
-    const token = this.jwtService.sign(payload);
+    const token = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
+    });
     return token;
   }
 
@@ -74,9 +77,12 @@ export class UserService {
     return `This action returns a #${id} user`;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto, userId: number) {
     try {
-      await this.userRepository.update(id, updateUserDto);
+      await this.userRepository.update(id, {
+        ...updateUserDto,
+        updated_by: userId,
+      });
       return this.userRepository.findOne({ where: { id } });
     } catch (error) {
       this.handleDBErrors(error);
