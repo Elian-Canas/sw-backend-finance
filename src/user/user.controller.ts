@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   Headers,
 } from '@nestjs/common';
 import { UserService } from './user.service';
@@ -18,8 +17,11 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post('register')
-  createUser(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  createUser(
+    @Body() createUserDto: CreateUserDto,
+    @Headers('user_id') userId: number,
+  ) {
+    return this.userService.create(createUserDto, userId);
   }
 
   @Post('login')
@@ -46,8 +48,12 @@ export class UserController {
     return this.userService.update(+id, updateUserDto, userId);
   }
 
-  @Patch('inactivate/:id')
-  inactivate(@Param('id') id: string) {
-    return this.userService.inactivate(+id);
+  @Patch('state/:id')
+  setState(
+    @Param('id') id: string,
+    @Body('state') state: number,
+    @Headers('user_id') userId: number,
+  ) {
+    return this.userService.setState(+id, state, userId);
   }
 }

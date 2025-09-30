@@ -22,13 +22,14 @@ export class UserService {
     private readonly configService: ConfigService,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto, userHeader: number) {
     try {
       const { password, ...userData } = createUserDto;
 
       const user = this.userRepository.create({
         ...userData,
         password: await this.encryptAdapter.encrypt(password),
+        created_by: userHeader ?? null,
       });
       await this.userRepository.save(user);
       return user;
@@ -89,10 +90,12 @@ export class UserService {
     }
   }
 
-  async inactivate(id: number) {
+  async setState(id: number, state: number, userId: number) {
     try {
-      await this.userRepository.update(id, { state: 0 });
-      return { message: 'User inactivated successfully' };
+      await this.userRepository.update(id, { state, updated_by: userId });
+      return {
+        message: `User ${state === 1 ? 'activated' : 'inactivated'} successfully`,
+      };
     } catch (error) {
       this.handleDBErrors(error);
     }

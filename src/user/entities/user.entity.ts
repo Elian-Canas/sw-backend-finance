@@ -33,14 +33,14 @@ export class User {
   state: number;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 
   @Column('int', { nullable: true })
-  createdBy: number;
+  created_by: number;
 
   @Column('int', { nullable: true })
-  updatedBy: number;
+  updated_by: number;
 }
