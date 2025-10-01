@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+import { User, UserState } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   BadRequestException,
@@ -91,7 +91,7 @@ export class UserService {
 
   async inactivate(id: number) {
     try {
-      await this.userRepository.update(id, { state: 0 });
+      await this.userRepository.update(id, { state: UserState.INACTIVE });
       return { message: 'User inactivated successfully' };
     } catch (error) {
       this.handleDBErrors(error);

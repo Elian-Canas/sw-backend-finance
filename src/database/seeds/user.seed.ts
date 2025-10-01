@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
+import { User, UserState } from '../../user/entities/user.entity';
 import { EncryptBcryptAdapter } from 'src/adapters/encrypt.adapter';
 
 @Injectable()
@@ -18,13 +18,15 @@ export class UserSeeder {
         email: 'swnotionfreelance@gmail.com',
         password: await this.encryptAdapter.encrypt('ElSan123*'),
         first_name: 'Admin User',
-        state: 1,
+        state: UserState.ACTIVE,
+        cached_profiles: ['admin', 'dev_admin'],
       },
       {
         email: 'mariaabonilla11@hotmail.com',
         password: await this.encryptAdapter.encrypt('User123!'),
         first_name: 'Regular User',
-        state: 1,
+        state: UserState.ACTIVE,
+        cached_profiles: ['user'],
       },
     ];
 
