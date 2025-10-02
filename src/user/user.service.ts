@@ -46,10 +46,10 @@ export class UserService {
     });
 
     if (!user)
-      throw new UnauthorizedException("Credentials are not valid (email)");
+      throw new UnauthorizedException('Credentials are not valid (email)');
 
     if (!this.encryptAdapter.compareSync(password, user.password)) {
-      throw new UnauthorizedException("Credentials are not valid (password)");
+      throw new UnauthorizedException('Credentials are not valid (password)');
     }
 
     return {
@@ -91,18 +91,20 @@ export class UserService {
   }
 
   async setState(id: number, state: number, userId: number) {
-  try {
+    try {
       await this.userRepository.update(id, { state, updated_by: userId });
-      return { message: `User ${state === 1 ? "activated" : "inactivated"} successfully` };
+      return {
+        message: `User ${state === 1 ? 'activated' : 'inactivated'} successfully`,
+      };
     } catch (error) {
       this.handleDBErrors(error);
     }
   }
 
   private handleDBErrors(error: any): never {
-    if (error.code === "23505") throw new BadRequestException(error.detail);
+    if (error.code === '23505') throw new BadRequestException(error.detail);
 
     console.log(error);
-    throw new InternalServerErrorException("Please check server logs");
+    throw new InternalServerErrorException('Please check server logs');
   }
 }
