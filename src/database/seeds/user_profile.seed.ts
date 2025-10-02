@@ -19,6 +19,11 @@ export class UserProfileSeeder {
         state: UserProfileState.ACTIVE,
       },
       {
+        user_id: 1,
+        profile_id: 2,
+        state: UserProfileState.ACTIVE,
+      },
+      {
         user_id: 2,
         profile_id: 3,
         state: UserProfileState.ACTIVE,

@@ -40,6 +40,7 @@ export class UserProfile {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
+  @Index()
   @Column({ type: 'int' })
   user_id: number;
 
@@ -54,12 +55,14 @@ export class UserProfile {
   @JoinColumn({ name: 'profile_id' })
   profile: Profile;
 
+  @Index()
   @Column({ type: 'int' })
   profile_id: number;
 
   /**
    * Campos de control
    */
+  @Index()
   @Column({
     type: 'smallint',
     default: UserProfileState.ACTIVE,

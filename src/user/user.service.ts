@@ -67,7 +67,9 @@ export class UserService {
 
   async findAll() {
     try {
-      const users = await this.userRepository.find({ where: { state: 1 } });
+      const users = await this.userRepository.find({
+        where: { state: UserState.ACTIVE },
+      });
       return users;
     } catch (error) {
       this.handleDBErrors(error);

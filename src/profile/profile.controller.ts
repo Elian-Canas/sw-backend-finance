@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Headers,
+} from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
@@ -7,9 +16,12 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 export class ProfileController {
   constructor(private readonly profileService: ProfileService) {}
 
-  @Post()
-  create(@Body() createProfileDto: CreateProfileDto) {
-    return this.profileService.create(createProfileDto);
+  @Post('create')
+  create(
+    @Body() createProfileDto: CreateProfileDto,
+    @Headers('user_id') userId: number,
+  ) {
+    return this.profileService.create(createProfileDto, userId);
   }
 
   @Get()
@@ -23,8 +35,12 @@ export class ProfileController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProfileDto: UpdateProfileDto) {
-    return this.profileService.update(+id, updateProfileDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateProfileDto: UpdateProfileDto,
+    @Headers('user_id') userId: number,
+  ) {
+    return this.profileService.update(+id, updateProfileDto, userId);
   }
 
   @Delete(':id')
