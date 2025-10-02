@@ -4,6 +4,9 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
+import { DatabaseSeedModule } from './database/database-seed.module';
+import { ProfileModule } from './profile/profile.module';
+import { UserProfileModule } from './user-profile/user-profile.module';
 
 @Module({
   imports: [
@@ -19,6 +22,9 @@ import { UserModule } from './user/user.module';
       synchronize: true,
     }),
     UserModule,
+    DatabaseSeedModule,
+    ProfileModule,
+    UserProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

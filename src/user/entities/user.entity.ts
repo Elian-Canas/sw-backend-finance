@@ -1,10 +1,24 @@
+import { UserProfile } from 'src/user-profile/entities/user-profile.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+
+/**
+ * Estados posibles para el usuario
+ */
+export enum UserState {
+  ACTIVE = 1, // Usuario activo
+  INACTIVE = 2, // Usuario inactivo (soft delete)
+  SUSPENDED = 3, // Usuario suspendido temporalmente
+  EXPIRED = 4, // Usuario expirado (para perfiles temporales)
+  PENDING = 5, // Pendiente de activación
+  REVOKED = 6, // Revocado por admin
+}
 
 @Entity('users')
 export class User {
@@ -27,10 +41,18 @@ export class User {
   @Column('text', { nullable: true })
   last_name: string;
 
-  @Column('int', {
-    default: 1,
+  // Relación uno a muchos con UserProfile
+  @OneToMany(() => UserProfile, (userProfile) => userProfile.user)
+  userProfiles: UserProfile[];
+
+  @Column('varchar', { array: true, nullable: true, default: [] })
+  cached_profiles: string[];
+
+  @Column({
+    type: 'smallint',
+    default: UserState.ACTIVE,
   })
-  state: number;
+  state: UserState;
 
   @CreateDateColumn()
   created_at: Date;

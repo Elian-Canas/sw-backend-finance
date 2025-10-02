@@ -1,16 +1,16 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
-import { Repository } from "typeorm";
-import { User } from "./entities/user.entity";
-import { InjectRepository } from "@nestjs/typeorm";
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { Repository } from 'typeorm';
+import { User, UserState } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 import {
   BadRequestException,
   InternalServerErrorException,
-} from "@nestjs/common";
-import { EncryptBcryptAdapter } from "src/adapters/encrypt.adapter";
-import { JwtService } from "@nestjs/jwt";
-import { JwtPayload } from "./interfaces/jwt-payload.interface";
+} from '@nestjs/common';
+import { EncryptBcryptAdapter } from 'src/adapters/encrypt.adapter';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UserService {
@@ -18,7 +18,8 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly encryptAdapter: EncryptBcryptAdapter,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   async create(createUserDto: CreateUserDto, userHeader: number) {
@@ -58,7 +59,9 @@ export class UserService {
   }
 
   private getJwtToken(payload: { id: number; email: string }) {
-    const token = this.jwtService.sign(payload);
+    const token = this.jwtService.sign(payload, {
+      expiresIn: this.configService.get<string>('JWT_EXPIRES_IN'),
+    });
     return token;
   }
 
@@ -75,9 +78,12 @@ export class UserService {
     return `This action returns a #${id} user`;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto, userId: number) {
     try {
-      await this.userRepository.update(id, updateUserDto);
+      await this.userRepository.update(id, {
+        ...updateUserDto,
+        updated_by: userId,
+      });
       return this.userRepository.findOne({ where: { id } });
     } catch (error) {
       this.handleDBErrors(error);
