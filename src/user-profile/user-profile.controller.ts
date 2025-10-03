@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Headers,
+} from '@nestjs/common';
 import { UserProfileService } from './user-profile.service';
 import { CreateUserProfileDto } from './dto/create-user-profile.dto';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto';
@@ -23,12 +32,24 @@ export class UserProfileController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserProfileDto: UpdateUserProfileDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateUserProfileDto: UpdateUserProfileDto,
+  ) {
     return this.userProfileService.update(+id, updateUserProfileDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.userProfileService.remove(+id);
+  }
+
+  @Post('state/:id')
+  setState(
+    @Param('id') id: string,
+    @Body('state') state: number,
+    @Headers('user_id') userId: number,
+  ) {
+    return this.userProfileService.setState(+id, state, userId);
   }
 }

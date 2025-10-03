@@ -42,7 +42,7 @@ export class UserService {
     const { email, password } = loginUserDto;
     const user = await this.userRepository.findOne({
       where: { email, state: 1 },
-      select: { password: true, email: true, id: true },
+      select: { password: true, email: true, id: true, cached_profiles: true },
     });
 
     if (!user)
