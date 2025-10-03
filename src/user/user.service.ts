@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+import { User, UserState } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   BadRequestException,
@@ -42,7 +42,7 @@ export class UserService {
     const { email, password } = loginUserDto;
     const user = await this.userRepository.findOne({
       where: { email, state: 1 },
-      select: { password: true, email: true, id: true },
+      select: { password: true, email: true, id: true, cached_profiles: true },
     });
 
     if (!user)
@@ -67,7 +67,9 @@ export class UserService {
 
   async findAll() {
     try {
-      const users = await this.userRepository.find({ where: { state: 1 } });
+      const users = await this.userRepository.find({
+        where: { state: UserState.ACTIVE },
+      });
       return users;
     } catch (error) {
       this.handleDBErrors(error);
