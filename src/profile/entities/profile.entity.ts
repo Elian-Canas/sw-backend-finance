@@ -42,7 +42,6 @@ export class Profile {
   })
   hierarchy_level: number;
 
-  @Index()
   @Column({
     type: 'smallint',
     default: ProfileState.ACTIVE,

@@ -1,20 +1,22 @@
-import {
-  BadRequestException,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Profile, ProfileState } from './entities/profile.entity';
 import { CommonService } from 'src/common/common.service';
+import { UserProfile } from './entities/user-profile.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ProfileService {
   constructor(
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+    @InjectRepository(UserProfile)
+    private readonly userProfileRepository: Repository<UserProfile>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly commonService: CommonService,
   ) {}
 
@@ -63,10 +65,56 @@ export class ProfileService {
     return `This action removes a #${id} profile`;
   }
 
-  private handleDBErrors(error: any): never {
-    if (error.code === '23505') throw new BadRequestException(error.detail);
+  async updateUserProfileState(id: number, state: number, userId: number) {
+    try {
+      // Obtener el UserProfile con su relación al Profile
+      const userProfile = await this.userProfileRepository.findOne({
+        where: { id },
+        relations: ['profile', 'user'],
+      });
 
-    console.log(error);
-    throw new InternalServerErrorException('Please check server logs');
+      if (!userProfile) {
+        throw new BadRequestException('User profile not found');
+      }
+
+      // Actualizar el estado del UserProfile
+      await this.userProfileRepository.update(id, {
+        state,
+        updated_by: userId,
+      });
+
+      // Actualizar el array cached_profiles del usuario según el estado
+      if (userProfile.profile) {
+        const user = await this.userRepository.findOne({
+          where: { id: userProfile.user_id },
+        });
+
+        if (user) {
+          let updatedProfiles = user.cached_profiles || [];
+
+          if (state === 1) {
+            // Si se activa el perfil, agregarlo si no está ya en el array
+            if (!updatedProfiles.includes(userProfile.profile.name)) {
+              updatedProfiles.push(userProfile.profile.name);
+            }
+          } else {
+            // Si se inactiva el perfil, removerlo del array
+            updatedProfiles = updatedProfiles.filter(
+              (profileName) => profileName !== userProfile.profile.name,
+            );
+          }
+
+          await this.userRepository.update(userProfile.user_id, {
+            cached_profiles: updatedProfiles,
+          });
+        }
+      }
+
+      return {
+        message: `User ${state === 1 ? 'activated' : 'inactivated'} successfully`,
+      };
+    } catch (error) {
+      this.commonService.handleDBErrors(error);
+    }
   }
 }

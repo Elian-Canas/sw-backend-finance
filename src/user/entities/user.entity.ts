@@ -1,4 +1,4 @@
-import { UserProfile } from 'src/user-profile/entities/user-profile.entity';
+import { UserProfile } from 'src/profile/entities/user-profile.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -22,6 +22,7 @@ export enum UserState {
 }
 
 @Entity('users')
+@Index(['email', 'state'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -49,7 +50,6 @@ export class User {
   @Column('varchar', { array: true, nullable: true, default: [] })
   cached_profiles: string[];
 
-  @Index()
   @Column({
     type: 'smallint',
     default: UserState.ACTIVE,

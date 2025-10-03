@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 // Entities
 import { User } from '../user/entities/user.entity';
 import { Profile } from 'src/profile/entities/profile.entity';
-import { UserProfile } from 'src/user-profile/entities/user-profile.entity';
+import { UserProfile } from 'src/profile/entities/user-profile.entity';
 
 // Seeders
 import { UserSeeder } from './seeds/user.seed';
