@@ -4,6 +4,7 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
 /**
@@ -19,10 +20,12 @@ export enum ProfileState {
 }
 
 @Entity('profiles')
+@Index(['state', 'name'])
 export class Profile {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Index({ unique: true })
   @Column('text', {
     unique: true,
   })
@@ -39,6 +42,7 @@ export class Profile {
   })
   hierarchy_level: number;
 
+  @Index()
   @Column({
     type: 'smallint',
     default: ProfileState.ACTIVE,
@@ -47,6 +51,9 @@ export class Profile {
 
   @Column('int', { nullable: true })
   parent_profile_id: number | null;
+
+  @Column('varchar', { array: true, nullable: true, default: [] })
+  cached_permissions: string[];
 
   @CreateDateColumn()
   created_at: Date;

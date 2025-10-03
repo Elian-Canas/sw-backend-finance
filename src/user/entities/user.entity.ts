@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
 
 /**
@@ -48,6 +49,7 @@ export class User {
   @Column('varchar', { array: true, nullable: true, default: [] })
   cached_profiles: string[];
 
+  @Index()
   @Column({
     type: 'smallint',
     default: UserState.ACTIVE,

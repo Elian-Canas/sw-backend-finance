@@ -7,6 +7,7 @@ import { UserModule } from './user/user.module';
 import { DatabaseSeedModule } from './database/database-seed.module';
 import { ProfileModule } from './profile/profile.module';
 import { UserProfileModule } from './user-profile/user-profile.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { UserProfileModule } from './user-profile/user-profile.module';
     DatabaseSeedModule,
     ProfileModule,
     UserProfileModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],
