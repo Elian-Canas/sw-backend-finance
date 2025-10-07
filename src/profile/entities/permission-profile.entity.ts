@@ -1,5 +1,4 @@
-import { Profile } from 'src/profile/entities/profile.entity';
-import { User } from 'src/user/entities/user.entity';
+import { Permission } from 'src/permission/entities/permission.entity';
 import {
   Column,
   CreateDateColumn,
@@ -10,11 +9,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Profile } from './profile.entity';
 
 /**
- * Estados posibles para la relación usuario-perfil
+ * Estados posibles para la relación permiso-perfil
  */
-export enum UserProfileState {
+export enum PermissionProfileState {
   ACTIVE = 1, // Perfil activo
   INACTIVE = 0, // Perfil inactivo (soft delete)
   SUSPENDED = 2, // Perfil suspendido temporalmente
@@ -23,30 +23,30 @@ export enum UserProfileState {
   REVOKED = 5, // Revocado por admin
 }
 
-@Index('idx_user_profile_state', ['user_id', 'profile_id', 'state'])
-@Entity('user_profiles')
-export class UserProfile {
+@Index('idx_permission_profile_state', ['permission_id', 'profile_id', 'state'])
+@Entity('permission_profiles')
+export class PermissionProfile {
   @PrimaryGeneratedColumn()
   id: number;
 
   /**
-   * Usuario al que se le asigna el perfil
+   * Permiso al que se le asigna el perfil
    */
-  @ManyToOne(() => User, (user) => user.userProfiles, {
-    onDelete: 'CASCADE', // Si se elimina el usuario, se eliminan sus asignaciones
+  @ManyToOne(() => Permission, (permission) => permission.permissionProfiles, {
+    onDelete: 'CASCADE', // Si se elimina el permiso, se eliminan sus asignaciones
     nullable: false,
-    eager: false, // No cargar automáticamente el usuario
+    eager: false, // No cargar automáticamente el permiso
   })
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  @JoinColumn({ name: 'permission_id' })
+  permission: Permission;
 
   @Column({ type: 'int' })
-  user_id: number;
+  permission_id: number;
 
   /**
    * Perfil asignado al usuario
    */
-  @ManyToOne(() => Profile, (profile) => profile.userProfiles, {
+  @ManyToOne(() => Profile, (profile) => profile.permissionProfiles, {
     onDelete: 'RESTRICT', // No permitir eliminar perfiles que están asignados
     nullable: false,
     eager: false, // No cargar automáticamente el perfil
@@ -62,31 +62,31 @@ export class UserProfile {
    */
   @Column({
     type: 'smallint',
-    default: UserProfileState.ACTIVE,
+    default: PermissionProfileState.ACTIVE,
     comment: 'Estado del registro (1. activo, 0. inactivo, etc.)',
   })
-  state: UserProfileState;
+  state: PermissionProfileState;
 
   @CreateDateColumn({
-    comment: 'Fecha y hora de creación de la relación usuario-perfil',
+    comment: 'Fecha y hora de creación de la relación permiso-perfil',
   })
   created_at: Date;
 
   @UpdateDateColumn({
     comment:
-      'Fecha y hora de última actualización de la relación usuario-perfil',
+      'Fecha y hora de última actualización de la relación permiso-perfil',
   })
   updated_at: Date;
 
   @Column('int', {
     nullable: true,
-    comment: 'ID del usuario que creó la relación usuario-perfil',
+    comment: 'ID del usuario que creó la relación permiso-perfil',
   })
   created_by: number;
 
   @Column('int', {
     nullable: true,
-    comment: 'ID del usuario que actualizó la relación usuario-perfil',
+    comment: 'ID del usuario que actualizó la relación permiso-perfil',
   })
   updated_by: number;
 }

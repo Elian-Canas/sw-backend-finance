@@ -65,6 +65,29 @@ export class ProfileService {
     return `This action removes a #${id} profile`;
   }
 
+  async setState(id: number, state: ProfileState, userId: number) {
+    try {
+      await this.profileRepository.update(id, { state, updated_by: userId });
+      const userProfiles = await this.userProfileRepository.find({
+        where: { profile_id: id },
+      });
+
+      if (state === ProfileState.INACTIVE) {
+        await Promise.all(
+          userProfiles.map((userProfile) =>
+            this.updateUserProfileState(userProfile.id, state, userId),
+          ),
+        );
+      }
+
+      return {
+        message: `Profile ${state === 1 ? 'activated' : 'inactivated'} successfully`,
+      };
+    } catch (error) {
+      this.commonService.handleDBErrors(error);
+    }
+  }
+
   async updateUserProfileState(id: number, state: number, userId: number) {
     try {
       // Obtener el UserProfile con su relación al Profile

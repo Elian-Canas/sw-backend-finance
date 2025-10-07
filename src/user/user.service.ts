@@ -8,6 +8,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
+import { CommonService } from 'src/common/common.service';
 import { EncryptBcryptAdapter } from 'src/adapters/encrypt.adapter';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -20,6 +21,7 @@ export class UserService {
     private readonly encryptAdapter: EncryptBcryptAdapter,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly commonService: CommonService,
   ) {}
 
   async create(createUserDto: CreateUserDto, userHeader: number) {
@@ -34,7 +36,7 @@ export class UserService {
       await this.userRepository.save(user);
       return user;
     } catch (error) {
-      this.handleDBErrors(error);
+      this.commonService.handleDBErrors(error);
     }
   }
 
@@ -46,7 +48,9 @@ export class UserService {
     });
 
     if (!user)
-      throw new UnauthorizedException('Credentials are not valid (email)');
+      throw new UnauthorizedException(
+        'Credentials are not valid, user not found',
+      );
 
     if (!this.encryptAdapter.compareSync(password, user.password)) {
       throw new UnauthorizedException('Credentials are not valid (password)');
@@ -72,7 +76,7 @@ export class UserService {
       });
       return users;
     } catch (error) {
-      this.handleDBErrors(error);
+      this.commonService.handleDBErrors(error);
     }
   }
 
@@ -88,7 +92,7 @@ export class UserService {
       });
       return this.userRepository.findOne({ where: { id } });
     } catch (error) {
-      this.handleDBErrors(error);
+      this.commonService.handleDBErrors(error);
     }
   }
 
@@ -99,14 +103,7 @@ export class UserService {
         message: `User ${state === 1 ? 'activated' : 'inactivated'} successfully`,
       };
     } catch (error) {
-      this.handleDBErrors(error);
+      this.commonService.handleDBErrors(error);
     }
-  }
-
-  private handleDBErrors(error: any): never {
-    if (error.code === '23505') throw new BadRequestException(error.detail);
-
-    console.log(error);
-    throw new InternalServerErrorException('Please check server logs');
   }
 }

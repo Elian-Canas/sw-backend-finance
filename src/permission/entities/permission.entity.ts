@@ -1,4 +1,13 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { PermissionProfile } from 'src/profile/entities/permission-profile.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
 /**
  * Estados posibles para el perfil
@@ -37,8 +46,9 @@ export class Permission {
 
   @Column('text', {
     comment: 'Submódulo al que pertenece el permiso',
+    nullable: true,
   })
-  submodule: string;
+  submodule?: string;
 
   @Column('text', {
     comment: 'Acción específica que permite este permiso',
@@ -47,48 +57,52 @@ export class Permission {
 
   @Column('text', {
     comment: 'Ámbito o alcance del permiso',
+    nullable: true,
   })
-  scope: string;
+  scope?: string;
 
   @Column('text', {
-    comment: 'ID del permiso padre (si aplica, para jerarquía)',
+    comment: 'Code del permiso padre (si aplica, para jerarquía)',
+    nullable: true,
   })
-  parent_id: string;
+  parent_code?: string | null;
 
   @Column('boolean', {
     comment: 'Indica si el permiso es un grupo de permisos',
   })
   is_group: boolean;
 
-  @Index()
+  // Relación uno a muchos con PermissionProfile
+  @OneToMany(
+    () => PermissionProfile,
+    (permissionProfile) => permissionProfile.permission,
+  )
+  permissionProfiles: PermissionProfile[];
+
   @Column('smallint', {
     default: PermissionState.ACTIVE,
-    comment: 'Estado del permiso (activo, inactivo, etc.)',
+    comment: 'Estado del permiso (1. activo, 0. inactivo, etc.)',
   })
   state: number;
 
-  @Column({ 
-    type: 'timestamp', 
-    default: () => 'CURRENT_TIMESTAMP',
+  @CreateDateColumn({
     comment: 'Fecha de creación del permiso',
   })
   created_at: Date;
 
-  @Column({
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-    onUpdate: 'CURRENT_TIMESTAMP',
+  @UpdateDateColumn({
+    nullable: true,
     comment: 'Fecha de última actualización del permiso',
   })
   updated_at: Date;
 
-  @Column('int', { 
+  @Column('int', {
     nullable: true,
     comment: 'ID del usuario que creó el permiso',
   })
   created_by: number | null;
 
-  @Column('int', { 
+  @Column('int', {
     nullable: true,
     comment: 'ID del usuario que actualizó el permiso por última vez',
   })
