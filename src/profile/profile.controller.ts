@@ -47,4 +47,22 @@ export class ProfileController {
   remove(@Param('id') id: string) {
     return this.profileService.remove(+id);
   }
+
+  @Post('user-profile/state/:id')
+  updateUserProfileState(
+    @Param('id') id: string,
+    @Body('state') state: number,
+    @Headers('user_id') userId: number,
+  ) {
+    return this.profileService.updateUserProfileState(+id, state, userId);
+  }
+
+  @Patch('state/:id')
+  setState(
+    @Param('id') id: string,
+    @Body('state') state: number,
+    @Headers('user_id') userId: number,
+  ) {
+    return this.profileService.setState(+id, state, userId);
+  }
 }

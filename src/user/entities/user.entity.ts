@@ -1,4 +1,4 @@
-import { UserProfile } from 'src/user-profile/entities/user-profile.entity';
+import { UserProfile } from 'src/profile/entities/user-profile.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -14,20 +14,22 @@ import {
  */
 export enum UserState {
   ACTIVE = 1, // Usuario activo
-  INACTIVE = 2, // Usuario inactivo (soft delete)
-  SUSPENDED = 3, // Usuario suspendido temporalmente
-  EXPIRED = 4, // Usuario expirado (para perfiles temporales)
-  PENDING = 5, // Pendiente de activación
-  REVOKED = 6, // Revocado por admin
+  INACTIVE = 0, // Usuario inactivo (soft delete)
+  SUSPENDED = 2, // Usuario suspendido temporalmente
+  EXPIRED = 3, // Usuario expirado (para perfiles temporales)
+  PENDING = 4, // Pendiente de activación
+  REVOKED = 5, // Revocado por admin
 }
 
 @Entity('users')
+@Index(['email', 'state'])
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column('text', {
     unique: true,
+    comment: 'Correo electrónico del único del usuario',
   })
   email: string;
 
@@ -36,10 +38,16 @@ export class User {
   })
   password: string;
 
-  @Column('text', { nullable: true })
+  @Column('text', {
+    nullable: true,
+    comment: 'Nombre(s) del usuario',
+  })
   first_name: string;
 
-  @Column('text', { nullable: true })
+  @Column('text', {
+    nullable: true,
+    comment: 'Apellido(s) del usuario',
+  })
   last_name: string;
 
   // Relación uno a muchos con UserProfile
@@ -49,22 +57,32 @@ export class User {
   @Column('varchar', { array: true, nullable: true, default: [] })
   cached_profiles: string[];
 
-  @Index()
   @Column({
     type: 'smallint',
     default: UserState.ACTIVE,
+    comment: 'Estado del usuario (1. activo, 0. inactivo, etc.)',
   })
   state: UserState;
 
-  @CreateDateColumn()
+  @CreateDateColumn({
+    comment: 'Fecha de creación del usuario',
+  })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({
+    comment: 'Fecha de última actualización del usuario',
+  })
   updated_at: Date;
 
-  @Column('int', { nullable: true })
+  @Column('int', {
+    nullable: true,
+    comment: 'ID del usuario que creó este registro',
+  })
   created_by: number;
 
-  @Column('int', { nullable: true })
+  @Column('int', {
+    nullable: true,
+    comment: 'ID del usuario que actualizó este registro',
+  })
   updated_by: number;
 }

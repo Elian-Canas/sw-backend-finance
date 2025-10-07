@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import {
   UserProfile,
   UserProfileState,
-} from 'src/user-profile/entities/user-profile.entity';
+} from 'src/profile/entities/user-profile.entity';
 
 export class UserProfileSeeder {
   constructor(

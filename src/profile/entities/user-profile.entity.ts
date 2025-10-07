@@ -16,11 +16,11 @@ import {
  */
 export enum UserProfileState {
   ACTIVE = 1, // Perfil activo
-  INACTIVE = 2, // Perfil inactivo (soft delete)
-  SUSPENDED = 3, // Perfil suspendido temporalmente
-  EXPIRED = 4, // Perfil expirado (para perfiles temporales)
-  PENDING = 5, // Pendiente de activación
-  REVOKED = 6, // Revocado por admin
+  INACTIVE = 0, // Perfil inactivo (soft delete)
+  SUSPENDED = 2, // Perfil suspendido temporalmente
+  EXPIRED = 3, // Perfil expirado (para perfiles temporales)
+  PENDING = 4, // Pendiente de activación
+  REVOKED = 5, // Revocado por admin
 }
 
 @Index('idx_user_profile_state', ['user_id', 'profile_id', 'state'])
@@ -40,7 +40,6 @@ export class UserProfile {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Index()
   @Column({ type: 'int' })
   user_id: number;
 
@@ -55,29 +54,39 @@ export class UserProfile {
   @JoinColumn({ name: 'profile_id' })
   profile: Profile;
 
-  @Index()
   @Column({ type: 'int' })
   profile_id: number;
 
   /**
    * Campos de control
    */
-  @Index()
   @Column({
     type: 'smallint',
     default: UserProfileState.ACTIVE,
+    comment: 'Estado del registro (1. activo, 0. inactivo, etc.)',
   })
   state: UserProfileState;
 
-  @CreateDateColumn()
+  @CreateDateColumn({
+    comment: 'Fecha y hora de creación de la relación usuario-perfil',
+  })
   created_at: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({
+    comment:
+      'Fecha y hora de última actualización de la relación usuario-perfil',
+  })
   updated_at: Date;
 
-  @Column('int', { nullable: true })
+  @Column('int', {
+    nullable: true,
+    comment: 'ID del usuario que creó la relación usuario-perfil',
+  })
   created_by: number;
 
-  @Column('int', { nullable: true })
+  @Column('int', {
+    nullable: true,
+    comment: 'ID del usuario que actualizó la relación usuario-perfil',
+  })
   updated_by: number;
 }
