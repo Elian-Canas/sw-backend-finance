@@ -1,19 +1,19 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { PermissionProfile } from 'src/profile/entities/permission-profile.entity';
+import { ProfilePermission } from 'src/profile/entities/profile-permission.entity';
 import { Repository } from 'typeorm';
 import {
   Permission,
   PermissionState,
 } from 'src/permission/entities/permission.entity';
 
-export class PermissionProfileSeeder {
+export class ProfilePermissionSeeder {
   permission: any;
 
   constructor(
     @InjectRepository(Permission)
     private readonly permissionRepository: Repository<Permission>,
-    @InjectRepository(PermissionProfile)
-    private readonly permissionProfileRepository: Repository<PermissionProfile>,
+    @InjectRepository(ProfilePermission)
+    private readonly permissionProfileRepository: Repository<ProfilePermission>,
   ) {}
 
   async run(): Promise<void> {
@@ -34,6 +34,7 @@ export class PermissionProfileSeeder {
     let basePermissionProfiles: {
       profile_id: number;
       permission_id: number;
+      state: number;
       created_by: number;
     }[] = [];
 
@@ -43,11 +44,13 @@ export class PermissionProfileSeeder {
         {
           profile_id: 1,
           permission_id: permissionId,
+          state: PermissionState.ACTIVE,
           created_by: 1,
         },
         {
           profile_id: 2,
           permission_id: permissionId,
+          state: PermissionState.ACTIVE,
           created_by: 1,
         },
       );
