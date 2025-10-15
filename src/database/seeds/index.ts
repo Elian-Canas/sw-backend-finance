@@ -3,14 +3,14 @@ import { UserSeeder } from './user.seed';
 import { ProfileSeeder } from './profile.seed';
 import { UserProfileSeeder } from './user_profile.seed';
 import { PermissionSeeder } from './permission.seed';
-import { PermissionProfileSeeder } from './permission_profile.seed';
+import { ProfilePermissionSeeder } from './profile_permission.seed';
 
 type SeederName =
   | 'user'
   | 'profile'
   | 'user-profile'
   | 'permission'
-  | 'permission-profile';
+  | 'profile-permission';
 
 @Injectable()
 export class DatabaseSeeder {
@@ -21,7 +21,7 @@ export class DatabaseSeeder {
     private readonly profileSeeder: ProfileSeeder,
     private readonly userProfileSeeder: UserProfileSeeder,
     private readonly permissionSeeder: PermissionSeeder,
-    private readonly permissionProfileSeeder: PermissionProfileSeeder,
+    private readonly permissionProfileSeeder: ProfilePermissionSeeder,
   ) {
     // Mapa de seeders disponibles
     this.seeders = {
@@ -29,7 +29,7 @@ export class DatabaseSeeder {
       user: this.userSeeder,
       'user-profile': this.userProfileSeeder,
       permission: this.permissionSeeder,
-      'permission-profile': this.permissionProfileSeeder,
+      'profile-permission': this.permissionProfileSeeder,
       // Agregar más seeders aquí
     };
   }

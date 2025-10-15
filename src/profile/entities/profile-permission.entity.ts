@@ -14,7 +14,7 @@ import { Profile } from './profile.entity';
 /**
  * Estados posibles para la relación permiso-perfil
  */
-export enum PermissionProfileState {
+export enum ProfilePermissionState {
   ACTIVE = 1, // Perfil activo
   INACTIVE = 0, // Perfil inactivo (soft delete)
   SUSPENDED = 2, // Perfil suspendido temporalmente
@@ -23,16 +23,16 @@ export enum PermissionProfileState {
   REVOKED = 5, // Revocado por admin
 }
 
-@Index('idx_permission_profile_state', ['permission_id', 'profile_id', 'state'])
-@Entity('permission_profiles')
-export class PermissionProfile {
+@Index('idx_profile_permission_state', ['permission_id', 'profile_id', 'state'])
+@Entity('profile_permissions')
+export class ProfilePermission {
   @PrimaryGeneratedColumn()
   id: number;
 
   /**
    * Permiso al que se le asigna el perfil
    */
-  @ManyToOne(() => Permission, (permission) => permission.permissionProfiles, {
+  @ManyToOne(() => Permission, (permission) => permission.profilePermissions, {
     onDelete: 'CASCADE', // Si se elimina el permiso, se eliminan sus asignaciones
     nullable: false,
     eager: false, // No cargar automáticamente el permiso
@@ -62,10 +62,10 @@ export class PermissionProfile {
    */
   @Column({
     type: 'smallint',
-    default: PermissionProfileState.ACTIVE,
+    default: ProfilePermissionState.ACTIVE,
     comment: 'Estado del registro (1. activo, 0. inactivo, etc.)',
   })
-  state: PermissionProfileState;
+  state: ProfilePermissionState;
 
   @CreateDateColumn({
     comment: 'Fecha y hora de creación de la relación permiso-perfil',

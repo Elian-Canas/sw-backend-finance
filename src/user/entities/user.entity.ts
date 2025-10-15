@@ -1,4 +1,4 @@
-import { UserProfile } from 'src/profile/entities/user-profile.entity';
+import { UserProfile } from 'src/user/entities/user-profile.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

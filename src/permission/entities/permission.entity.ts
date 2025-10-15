@@ -1,4 +1,4 @@
-import { PermissionProfile } from 'src/profile/entities/permission-profile.entity';
+import { ProfilePermission } from 'src/profile/entities/profile-permission.entity';
 import {
   Column,
   CreateDateColumn,
@@ -72,12 +72,12 @@ export class Permission {
   })
   is_group: boolean;
 
-  // Relación uno a muchos con PermissionProfile
+  // Relación uno a muchos con ProfilePermission
   @OneToMany(
-    () => PermissionProfile,
-    (permissionProfile) => permissionProfile.permission,
+    () => ProfilePermission,
+    (profilePermission) => profilePermission.permission,
   )
-  permissionProfiles: PermissionProfile[];
+  profilePermissions: ProfilePermission[];
 
   @Column('smallint', {
     default: PermissionState.ACTIVE,

@@ -5,7 +5,7 @@ import { CreateProfileDto } from './dto/create-profile.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Profile, ProfileState } from './entities/profile.entity';
 import { CommonService } from 'src/common/common.service';
-import { UserProfile } from './entities/user-profile.entity';
+import { UserProfile } from '../user/entities/user-profile.entity';
 import { User } from 'src/user/entities/user.entity';
 
 @Injectable()

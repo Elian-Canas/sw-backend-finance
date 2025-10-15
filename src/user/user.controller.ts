@@ -6,21 +6,23 @@ import {
   Patch,
   Param,
   Headers,
+  Request,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(AuthGuard('jwt'))
   @Post('register')
-  createUser(
-    @Body() createUserDto: CreateUserDto,
-    @Headers('user_id') userId: number,
-  ) {
+  createUser(@Body() createUserDto: CreateUserDto, @Request() req) {
+    const userId = req.user.id;
     return this.userService.create(createUserDto, userId);
   }
 
@@ -39,21 +41,25 @@ export class UserController {
     return this.userService.findOne(+id);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Patch(':id')
   update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
-    @Headers('user_id') userId: number,
+    @Request() req,
   ) {
+    const userId = req.user.id;
     return this.userService.update(+id, updateUserDto, userId);
   }
 
+  @UseGuards(AuthGuard('jwt'))
   @Patch('state/:id')
   setState(
     @Param('id') id: string,
     @Body('state') state: number,
-    @Headers('user_id') userId: number,
+    @Request() req,
   ) {
+    const userId = req.user.id;
     return this.userService.setState(+id, state, userId);
   }
 }
